@@ -1,0 +1,6 @@
+store_id,store_name,street,house_number,city,zip_code,country_code,shelf_capacity,is_active,opened_at,_loaded_at
+STR001,Flinky Mitte,Alexanderplatz,1,Berlin,10178,DE,500,true,2021-03-01,2024-01-15 00:00:00
+STR002,Flinky Amsterdam Centrum,Damrak,10,Amsterdam,1012LH,NL,420,true,2021-06-01,2024-01-15 00:00:00
+STR003,Flinky Prenzlauer Berg,Prenzlauer Allee,45,Berlin,10405,DE,380,true,2021-09-01,2024-01-15 00:00:00
+STR004,Flinky Kreuzberg,Oranienstrasse,22,Berlin,10999,DE,450,true,2022-01-01,2024-01-15 00:00:00
+STR005,Flinky Rotterdam,Coolsingel,50,Rotterdam,3012AG,NL,350,false,2022-03-01,2024-01-15 00:00:00

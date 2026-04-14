@@ -1,0 +1,7 @@
+customer_id,first_name,last_name,birthdate,sex,street,house_number,zip_code,country_code,registered_at,customer_tier,customer_status,_loaded_at
+CUST001,Sophie,Wagner,1990-05-12,F,Kastanienallee,22,10435,DE,2021-04-01,gold,active,2024-01-15 00:00:00
+CUST002,Felix,Braun,1985-09-28,M,Schonhauser Allee,55,10437,DE,2021-07-15,silver,active,2024-01-15 00:00:00
+CUST003,Emma,Bakker,1995-02-14,F,Herengracht,200,1016BS,NL,2022-01-10,bronze,active,2024-01-15 00:00:00
+CUST004,Jonas,Koch,1988-11-03,M,Karl-Marx-Allee,10,10178,DE,2021-05-20,gold,active,2024-01-15 00:00:00
+CUST005,Laura,Wolf,1993-07-19,F,Torstrasse,80,10119,DE,2022-03-05,silver,active,2024-01-15 00:00:00
+CUST006,Pieter,van Dam,1991-12-25,M,Leidsestraat,30,1017PB,NL,2022-06-01,bronze,churned,2024-01-15 00:00:00

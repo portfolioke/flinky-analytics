@@ -1,0 +1,6 @@
+supplier_id,supplier_name,city,street,zip_code,house_number,country_code,_loaded_at
+SUP001,Friesland Campina,Berlin,Gewerbestrasse,12345,10,DE,2024-01-15 00:00:00
+SUP002,Backerei Hoffmann,Berlin,Backerweg,10115,5,DE,2024-01-15 00:00:00
+SUP003,Fresh Farms GmbH,Hamburg,Marktstrasse,20095,22,DE,2024-01-15 00:00:00
+SUP004,Vilsa Mineralbrunnen,Bruchhausen-Vilsen,Quellenweg,27305,1,DE,2024-01-15 00:00:00
+SUP005,Deoleo Nederland,Amsterdam,Industrieweg,1042,15,NL,2024-01-15 00:00:00

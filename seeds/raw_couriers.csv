@@ -1,0 +1,6 @@
+courier_id,first_name,last_name,birthdate,sex,street,house_number,zip_code,country_code,courier_zone,contract_type,employment_date,employment_rank,employment_status,hourly_rate_eur,_loaded_at
+COU001,Max,Mueller,1995-03-15,M,Unter den Linden,10,10117,DE,STR001,full_time,2022-01-10,senior_courier,active,14.50,2024-01-15 00:00:00
+COU002,Anna,Schmidt,1998-07-22,F,Friedrichstrasse,45,10117,DE,STR001,part_time,2022-06-01,courier,active,12.00,2024-01-15 00:00:00
+COU003,Jan,de Vries,1993-11-30,M,Damrak,20,1012LH,NL,STR002,full_time,2021-09-15,senior_courier,active,15.00,2024-01-15 00:00:00
+COU004,Lisa,Becker,1997-04-18,F,Prenzlauer Allee,60,10405,DE,STR003,full_time,2023-02-01,courier,active,12.00,2024-01-15 00:00:00
+COU005,Tom,Jansen,1990-08-05,M,Keizersgracht,100,1015CJ,NL,STR002,part_time,2022-11-01,courier,active,12.50,2024-01-15 00:00:00

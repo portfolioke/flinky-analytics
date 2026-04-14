@@ -1,0 +1,8 @@
+contract_id,courier_id,contract_type,employment_rank,hourly_rate_eur,valid_from,valid_to,updated_at,_loaded_at
+CONT001,COU001,full_time,courier,12.00,2022-01-10,2023-03-31,2023-04-01,2024-01-15 00:00:00
+CONT002,COU001,full_time,senior_courier,14.50,2023-04-01,,2023-04-01,2024-01-15 00:00:00
+CONT003,COU002,part_time,courier,12.00,2022-06-01,,2022-06-01,2024-01-15 00:00:00
+CONT004,COU003,full_time,courier,13.00,2021-09-15,2022-12-31,2023-01-01,2024-01-15 00:00:00
+CONT005,COU003,full_time,senior_courier,15.00,2023-01-01,,2023-01-01,2024-01-15 00:00:00
+CONT006,COU004,full_time,courier,12.00,2023-02-01,,2023-02-01,2024-01-15 00:00:00
+CONT007,COU005,part_time,courier,12.50,2022-11-01,,2022-11-01,2024-01-15 00:00:00

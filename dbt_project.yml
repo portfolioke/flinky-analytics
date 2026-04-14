@@ -1,0 +1,79 @@
+
+# Name your project! Project names should contain only lowercase characters
+# and underscores. A good package name should reflect your organization's
+# name or the intended use of these models
+name: 'flinky_analytics'
+version: '1.0.0'
+config-version: 2
+
+# This setting configures which "profile" dbt uses for this project.
+profile: 'flinky_analytics'
+
+# These configurations specify where dbt should look for different types of files.
+# The `model-paths` config, for example, states that models in this project can be
+# found in the "models/" directory. You probably won't need to change these!
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:         # directories to be removed by `dbt clean`
+  - "target"
+  - "dbt_packages"
+
+
+# Configuring models
+# Full documentation: https://docs.getdbt.com/docs/configuring-models
+
+# In this example config, we tell dbt to build all models in the example/
+# directory as views. These settings can be overridden in the individual model
+# files using the `{{ config(...) }}` macro.
+models:
+  flinky_analytics:
+    # Config indicated by + and applies to all files under models/example/
+    staging:
+      +materialized: view
+      +schema: staging
+
+    intermediate:
+      +materialized: table
+      +schema: intermediate
+
+    marts:
+      +materialized: table
+
+      operations:
+        +schema: marts_operations
+        +partition_by:              # divide the table into date buckets — coarse filter --> like a cabinet in the draw.
+          field: event_timestamp
+          data_type: timestamp
+          granularity: day
+        +cluster_by:                # sort rows within each bucket — fine filter --> section of the cabinet.
+          - store_id
+          - courier_id
+      
+      finance:
+        +schema: marts_finance
+
+      hr:
+        +schema: marts_hr
+
+      inventory:
+        +schema: marts_inventory
+        +partition_by:
+          field: event_timestamp
+          data_type: timestamp
+          granularity: day
+        +cluster_by:
+          - store_id
+          - sku_id
+
+
+
+seeds:
+  flinky_analytics:
+    +schema: raw
+    +quote_columns: false
+    

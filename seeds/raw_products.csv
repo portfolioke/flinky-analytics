@@ -1,0 +1,9 @@
+sku_id,product_name,category,supplier_id,unit_of_measure,shelf_life_days,_loaded_at
+SKU001,Organic Whole Milk 1L,dairy,SUP001,unit,7,2024-01-15 00:00:00
+SKU002,Sourdough Bread 500g,bakery,SUP002,unit,3,2024-01-15 00:00:00
+SKU003,Free Range Eggs 6pk,dairy,SUP001,unit,21,2024-01-15 00:00:00
+SKU004,Banana 1kg,fresh_produce,SUP003,kg,5,2024-01-15 00:00:00
+SKU005,Sparkling Water 1.5L,beverages,SUP004,unit,365,2024-01-15 00:00:00
+SKU006,Greek Yogurt 500g,dairy,SUP001,unit,14,2024-01-15 00:00:00
+SKU007,Cherry Tomatoes 250g,fresh_produce,SUP003,unit,4,2024-01-15 00:00:00
+SKU008,Olive Oil 500ml,pantry,SUP005,unit,730,2024-01-15 00:00:00
