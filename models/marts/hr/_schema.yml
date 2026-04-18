@@ -1,0 +1,39 @@
+version: 2
+
+models:
+  - name: fct_courier_shifts
+    description: >
+      One row per courier per shift date. Grain is courier_id + shift_date.
+      Gross pay calculated using SCD2 temporal join to
+      courier_contracts_snapshot — ensures correct historical
+      rate is used even after pay raises.
+      Cumulative hours computed via SUM OVER window function.
+      Partitioned by shift_date, clustered by courier_id.
+    columns:
+      - name: courier_id
+        description: FK to dim_couriers
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_couriers')
+              field: courier_id
+      - name: shift_date
+        description: Date of the shift
+        tests:
+          - not_null
+      - name: hours_worked
+        description: >
+          Hours from first to last courier event.
+          Approximate — based on event timestamps.
+        tests:
+          - not_null
+      - name: gross_pay_eur
+        description: >
+          Gross pay for the shift in EUR.
+          Calculated at the hourly rate valid on shift_date.
+          NULL if no matching contract found for the shift date.
+      - name: cumulative_hours_worked
+        description: >
+          Running total of hours worked by courier up to
+          and including this shift. Computed via
+          SUM OVER window function.
