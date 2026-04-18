@@ -1,0 +1,199 @@
+version: 2
+
+models:
+  - name: stg_order_events
+    description: >
+      One row per order per status change event. Cleaned and renamed
+      from raw_order_events. Grain is order_id + event_timestamp.
+      Status normalised to lowercase. Source of truth for order
+      lifecycle and P2D calculation.
+    columns:
+      - name: order_id
+        description: Unique identifier for each order
+        tests:
+          - not_null
+      - name: order_status
+        description: Current status of the order — normalised to lowercase
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['placed', 'picking', 'packed',
+                       'dispatched', 'delivered', 'cancelled']
+      - name: event_timestamp
+        description: Timestamp when this status change occurred
+        tests:
+          - not_null
+      - name: store_id
+        description: FK to dim_dark_stores — dark store fulfilling the order
+        tests:
+          - not_null
+      - name: courier_id
+        description: FK to dim_couriers — courier assigned to the order
+        tests:
+          - not_null
+      - name: customer_id
+        description: FK to dim_customers — customer who placed the order
+        tests:
+          - not_null
+      - name: country_code
+        description: Country where the order was placed — DE or NL
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['de', 'nl']
+
+  - name: stg_order_line_items
+    description: >
+      One row per product per order. Cleaned and renamed from
+      raw_order_line_items. Grain is line_item_id.
+      Contains pricing and tax information at line item level.
+    columns:
+      - name: line_item_id
+        description: Unique identifier for each line item
+        tests:
+          - unique
+          - not_null
+      - name: order_id
+        description: FK to stg_order_events
+        tests:
+          - not_null
+      - name: sku_id
+        description: FK to dim_products — product ordered
+        tests:
+          - not_null
+      - name: quantity
+        description: Number of units ordered — always positive
+        tests:
+          - not_null
+      - name: price_net_eur
+        description: Net price per unit in EUR excluding tax
+        tests:
+          - not_null
+      - name: price_gross_eur
+        description: Gross price per unit in EUR including tax
+        tests:
+          - not_null
+      - name: tax_code
+        description: Tax code applied to this line item
+        tests:
+          - not_null
+
+  - name: stg_courier_events
+    description: >
+      One row per courier status change event per order.
+      Cleaned and renamed from raw_courier_events.
+      Grain is courier_event_id. Source for int_courier_shifts.
+    columns:
+      - name: courier_event_id
+        description: Unique identifier for each courier event
+        tests:
+          - not_null
+      - name: order_id
+        description: FK to stg_order_events
+        tests:
+          - not_null
+      - name: courier_id
+        description: FK to stg_couriers
+        tests:
+          - not_null
+      - name: store_id
+        description: FK to stg_dark_stores
+        tests:
+          - not_null
+      - name: event_type
+        description: Type of courier event — normalised to lowercase
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['picking', 'packed', 'dispatched', 'delivered']
+      - name: event_timestamp
+        description: Timestamp when this courier event occurred
+        tests:
+          - not_null
+
+  - name: stg_couriers
+    description: >
+      One row per courier. Cleaned and renamed from raw_couriers.
+      PII masked — first_name and last_name hashed, sex nullified,
+      birthdate generalised to age_group.
+    columns:
+      - name: courier_id
+        description: Unique identifier for each courier
+        tests:
+          - unique
+          - not_null
+      - name: courier_zone
+        description: Dark store zone the courier is assigned to
+        tests:
+          - not_null
+      - name: contract_type
+        description: Employment contract type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['full_time', 'part_time']
+      - name: employment_status
+        description: Current employment status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['active', 'inactive']
+      - name: hourly_rate_eur
+        description: Current hourly rate in EUR
+        tests:
+          - not_null
+
+  - name: stg_dark_stores
+    description: >
+      One row per dark store. Cleaned and renamed from raw_dark_stores.
+      Includes shelf capacity and active status.
+      SCD2 handled via snapshot in snapshots layer.
+    columns:
+      - name: store_id
+        description: Unique identifier for each dark store
+        tests:
+          - unique
+          - not_null
+      - name: country_code
+        description: Country where the store operates — de or nl
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['de', 'nl']
+      - name: shelf_capacity
+        description: Total shelf capacity in units
+        tests:
+          - not_null
+      - name: is_active
+        description: Whether the store is currently operational
+        tests:
+          - not_null
+
+  - name: stg_courier_contracts
+    description: >
+      One row per courier contract. Cleaned and renamed from
+      raw_courier_contracts. Multiple rows per courier when
+      contract changes occur. Source for SCD2 snapshot.
+      valid_to is NULL for the current active contract.
+    columns:
+      - name: contract_id
+        description: Unique identifier for each contract
+        tests:
+          - unique
+          - not_null
+      - name: courier_id
+        description: FK to stg_couriers
+        tests:
+          - not_null
+      - name: hourly_rate_eur
+        description: Hourly rate in EUR for this contract period
+        tests:
+          - not_null
+      - name: valid_from
+        description: Date from which this contract is effective
+        tests:
+          - not_null
+      - name: valid_to
+        description: >
+          Date until which this contract is effective.
+          NULL means this is the current active contract.
