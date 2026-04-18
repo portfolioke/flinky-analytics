@@ -1,0 +1,47 @@
+version: 2
+
+models:
+  - name: int_order_timeline
+    description: >
+      One row per order. Deduplicates raw order events and pivots
+      status changes into milestone timestamp columns.
+      Grain is order_id. Feeds fct_orders.
+    columns:
+      - name: order_id
+        description: Unique identifier per order
+        tests:
+          - unique
+          - not_null
+      - name: order_placed_at
+        description: Timestamp when order was placed by customer
+        tests:
+          - not_null
+      - name: delivered_at
+        description: >
+          Timestamp when order was delivered.
+          NULL if order was cancelled or is still in progress.
+      - name: cancelled_at
+        description: >
+          Timestamp when order was cancelled.
+          NULL if order was delivered or is still in progress.
+
+  - name: int_courier_shifts
+    description: >
+      One row per courier per shift date. Sessionises courier events
+      into shifts with hours worked and deliveries completed.
+      Grain is courier_id + shift_date. Feeds fct_courier_shifts.
+    columns:
+      - name: courier_id
+        description: FK to dim_couriers
+        tests:
+          - not_null
+      - name: shift_date
+        description: Date of the shift
+        tests:
+          - not_null
+      - name: hours_worked
+        description: >
+          Hours worked computed from first to last courier event.
+          Approximate — based on event timestamps not clock-in/out.
+      - name: deliveries_completed
+        description: Number of distinct orders fulfilled during the shift
