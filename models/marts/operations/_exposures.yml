@@ -1,0 +1,33 @@
+version: 2
+
+exposures:
+  - name: operations_dashboard
+    type: dashboard
+    maturity: medium
+    description: >
+      Operations dashboard showing P2D, picker lag, and dark store
+      throughput. Primary consumer of fct_orders.
+      Breaking changes to fct_orders grain or p2d_minutes column
+      will break this dashboard.
+    depends_on:
+      - ref('fct_orders')
+      - ref('dim_dark_stores')
+      - ref('dim_couriers')
+      - ref('dim_date')
+    owner:
+      name: Kyamil Ergyun
+      email: k.ergyun@flinky.com
+
+  - name: courier_payroll_report
+    type: dashboard
+    maturity: medium
+    description: >
+      Monthly courier payroll report. Depends on SCD2 temporal join
+      in fct_courier_shifts. Renaming hourly_rate_eur or gross_pay_eur
+      will break downstream payroll calculations.
+    depends_on:
+      - ref('fct_courier_shifts')
+      - ref('dim_couriers')
+    owner:
+      name: Kyamil Ergyun
+      email: k.ergyun@flinky.com
