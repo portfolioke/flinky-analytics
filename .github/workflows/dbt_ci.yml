@@ -1,0 +1,60 @@
+name: dbt CI
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  dbt-ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dbt
+        run: pip install dbt-bigquery==1.11.1
+
+      - name: Set up BigQuery credentials
+        run: |
+          echo '${{ secrets.BIGQUERY_KEYFILE }}' > /tmp/keyfile.json
+
+      - name: Set up dbt profiles
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << EOF
+          flinky_analytics:
+            target: ci
+            outputs:
+              ci:
+                type: bigquery
+                method: service-account
+                project: dwh-kyamil
+                dataset: flinky_ci
+                keyfile: /tmp/keyfile.json
+                location: US
+                priority: interactive
+                threads: 4
+                job_execution_timeout_seconds: 600
+                job_retries: 1
+          EOF
+
+      - name: Install dbt dependencies
+        run: |
+          cd flinky_analytics
+          dbt deps
+
+      - name: Run dbt compile
+        run: |
+          cd flinky_analytics
+          dbt compile
+
+      - name: Run dbt build
+        run: |
+          cd flinky_analytics
+          dbt build --target ci
