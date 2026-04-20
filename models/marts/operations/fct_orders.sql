@@ -1,6 +1,8 @@
 {{
     config(
-        materialized = 'table',
+        materialized = 'incremental',
+        unique_key = 'order_id',
+        on_schema_change = 'append_new_columns',
         partition_by = {
             "field": "order_placed_at",
             "data_type": "timestamp",
@@ -12,6 +14,15 @@
 
 WITH orders AS (
     SELECT * FROM {{ ref('int_order_timeline') }}
+
+    -- 3-day lookback catches late-arriving courier events
+    -- without reprocessing full history on every run
+    {% if is_incremental() %}
+        WHERE order_placed_at >= (
+            SELECT TIMESTAMP_SUB(MAX(order_placed_at), INTERVAL 3 DAY)
+            FROM {{ this }}
+        )
+    {% endif %}
 ),
 
 dark_stores AS (
@@ -86,6 +97,19 @@ final AS (
         ON o.store_id = ds.store_id
     LEFT JOIN couriers c
         ON o.courier_id = c.courier_id
+),
+-- Deduplicate final output to guarantee one row per order_id
+-- Defensive measure against fanout from dimensional joins
+deduped_final AS (
+    SELECT
+        *,
+        ROW_NUMBER() OVER (
+            PARTITION BY order_id
+            ORDER BY order_placed_at DESC
+        ) AS row_num
+    FROM final
 )
 
-SELECT * FROM final
+SELECT * EXCEPT(row_num)
+FROM deduped_final
+WHERE row_num = 1

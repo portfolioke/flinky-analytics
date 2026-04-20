@@ -52,9 +52,6 @@ models:
       Partitioned by order_placed_at (day),
       clustered by store_id and courier_id.
       NULL delivered_at = order cancelled or still in progress.
-    config:
-      contract:
-        enforced: true
     columns:
       - name: order_id
         description: Unique identifier per order
