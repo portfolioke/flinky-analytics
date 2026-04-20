@@ -12,9 +12,20 @@ WITH couriers AS (
 
 -- Join to snapshot to get current contract details
 -- dbt_valid_to IS NULL = current active contract
+-- Get current contract per courier — deduplicate in case
+-- snapshot has multiple NULL valid_to rows for same courier
 contracts AS (
-    SELECT * FROM {{ ref('courier_contracts_snapshot') }}
-    WHERE dbt_valid_to IS NULL
+    SELECT * FROM (
+        SELECT
+            *,
+            ROW_NUMBER() OVER (
+                PARTITION BY courier_id
+                ORDER BY dbt_valid_from DESC
+            ) AS row_num
+        FROM {{ ref('courier_contracts_snapshot') }}
+        WHERE dbt_valid_to IS NULL
+    )
+    WHERE row_num = 1
 ),
 
 final AS (
