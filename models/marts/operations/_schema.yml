@@ -1,0 +1,116 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: >
+      Shared date dimension generated via dbt_utils.date_spine.
+      One row per day for 2024. Used across all domains for
+      time-based analysis. Key use case: OOS rate by hour
+      requires every hour to appear even with no activity.
+    columns:
+      - name: date_id
+        description: Primary key — the date itself
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_dark_stores
+    description: >
+      One row per dark store. SCD1 — current state only.
+      Includes shelf capacity and active status.
+      SCD2 would be needed if historical capacity analysis
+      is required — not in scope for current domains.
+    columns:
+      - name: store_id
+        description: Unique identifier for each dark store
+        tests:
+          - unique
+          - not_null
+      - name: is_active
+        description: Whether the store is currently operational
+        tests:
+          - not_null
+
+  - name: dim_couriers
+    description: >
+      One row per courier. SCD1 current state.
+      Joins to courier_contracts_snapshot for current
+      hourly rate. For historical rate analysis use
+      fct_courier_shifts which applies the SCD2 temporal join.
+    columns:
+      - name: courier_id
+        description: Unique identifier for each courier
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_orders
+    description: >
+      One row per order. Grain is order_id.
+      Contains all milestone timestamps and computed SLA metrics.
+      P2D is the primary Flinky operational metric.
+      Partitioned by order_placed_at (day),
+      clustered by store_id and courier_id.
+      NULL delivered_at = order cancelled or still in progress.
+    columns:
+      - name: order_id
+        description: Unique identifier per order
+        tests:
+          - unique
+          - not_null
+      - name: store_id
+        description: FK to dim_dark_stores
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_dark_stores')
+              field: store_id
+      - name: courier_id
+        description: FK to dim_couriers
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_couriers')
+              field: courier_id
+      - name: order_placed_at
+        description: Timestamp when order was placed — partition key
+        tests:
+          - not_null
+      - name: p2d_minutes
+        description: >
+          Promise-to-Door time in minutes.
+          NULL if order was cancelled or not yet delivered.
+          Valid range: 2-120 minutes. Tested via singular test.
+      - name: current_status
+        description: >
+          Derived from milestone columns — not taken from source.
+          Avoids late-arriving status event issues.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['placed', 'picking', 'packed',
+                       'in_transit', 'delivered', 'cancelled']
+
+  - name: fct_order_line_items
+    description: >
+      One row per product per order. Grain is line_item_id.
+      Contains pricing, quantity, and tax at line item level.
+      Line totals derived here — not stored in source system.
+    columns:
+      - name: line_item_id
+        description: Unique identifier per line item
+        tests:
+          - unique
+          - not_null
+      - name: order_id
+        description: FK to fct_orders
+        tests:
+          - not_null
+      - name: sku_id
+        description: FK to dim_products
+        tests:
+          - not_null
+      - name: quantity
+        description: Units ordered — always positive
+        tests:
+          - not_null

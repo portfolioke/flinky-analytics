@@ -1,0 +1,100 @@
+version: 2
+
+sources:
+  - name: flinky_raw
+    database: dwh-kyamil
+    schema: flinky_dev_raw
+    config:
+      loaded_at_field: _loaded_at
+
+    tables:
+      - name: raw_order_events
+        description: >
+          Append-only event log from Flinky's order management system.
+          One row per order per status change. Source of truth for
+          order lifecycle and P2D calculation.
+        config:
+          freshness:
+            warn_after: {count: 30, period: minute}
+            error_after: {count: 2, period: hour}
+  
+      - name: raw_order_line_items
+        description: >
+          One row per product per order. Contains pricing, quantity,
+          and tax information at line item level.
+        config:
+          freshness:
+            warn_after: {count: 30, period: minute}
+            error_after: {count: 2, period: hour}
+
+      - name: raw_courier_events
+        description: >
+          Append-only event log from the courier mobile app.
+          One row per courier status change per order.
+        config:
+          freshness:
+            warn_after: {count: 15, period: minute}
+            error_after: {count: 1, period: hour}
+
+      - name: raw_couriers
+        description: >
+          Current state of all couriers. Contains PII —
+          sex and birthdate masked in staging layer.
+        config:
+          freshness:
+            warn_after: {count: 1, period: day}
+            error_after: {count: 3, period: day}
+
+      - name: raw_courier_contracts
+        description: >
+          Employment contracts per courier. Multiple rows per courier
+          when contract changes occur. Source for SCD2 snapshot.
+        config:
+          freshness:
+            warn_after: {count: 1, period: day}
+            error_after: {count: 3, period: day}
+
+      - name: raw_dark_stores
+        description: >
+          Current state of all Flinky dark stores across DE and NL.
+          Includes shelf capacity and active status.
+        config:
+          freshness:
+            warn_after: {count: 1, period: day}
+            error_after: {count: 3, period: day}
+
+      - name: raw_customers
+        description: >
+          Current state of all customers. Contains PII —
+          sex and birthdate masked in staging layer.
+        config:
+          freshness:
+            warn_after: {count: 1, period: day}
+            error_after: {count: 3, period: day}
+
+      - name: raw_inventory_events
+        description: >
+          Append-only event log from the Warehouse Management System.
+          One row per stock movement — received, picked, or wasted.
+          Quantity is positive for inbound, negative for outbound.
+        config:
+          freshness:
+            warn_after: {count: 2, period: hour}
+            error_after: {count: 6, period: hour}
+
+      - name: raw_products
+        description: >
+          Product catalogue. One row per SKU.
+          Source for dim_products.
+        config:
+          freshness:
+            warn_after: {count: 1, period: day}
+            error_after: {count: 3, period: day}
+
+      - name: raw_suppliers
+        description: >
+          Supplier master data. One row per supplier.
+        config:
+          freshness:
+            warn_after: {count: 1, period: day}
+            error_after: {count: 3, period: day}
