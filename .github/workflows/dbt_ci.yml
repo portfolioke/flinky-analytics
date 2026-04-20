@@ -45,16 +45,10 @@ jobs:
           EOF
 
       - name: Install dbt dependencies
-        run: |
-          cd flinky_analytics
-          dbt deps
+        run: dbt deps
 
       - name: Run dbt compile
-        run: |
-          cd flinky_analytics
-          dbt compile
+        run: dbt compile
 
       - name: Run dbt build
-        run: |
-          cd flinky_analytics
-          dbt build --target ci
+        run: dbt build --target ci
