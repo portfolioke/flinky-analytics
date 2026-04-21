@@ -19,15 +19,15 @@ tested, consumer-ready data marts.
 ---
 
 ## Project Structure
-models/
-staging/          # 1:1 with source tables. Cast, rename, mask PII. Views.
-intermediate/     # Business logic. Deduplication, pivots, sessionisation.
-marts/
-operations/     # Order lifecycle, P2D metrics, dark store performance
-hr/             # Courier shifts, payroll, SCD2 contract history
-snapshots/          # SCD2 snapshot for courier contracts
-tests/              # Singular business rule tests
-seeds/              # Sample data simulating raw source tables
+- models
+- staging/            --> 1:1 with source tables. Cast, rename, mask PII. Views.
+- intermediate/       --> Business logic. Deduplication, pivots, sessionisation.
+- marts
+- operations/         --> Order lifecycle, P2D metrics, dark store performance
+- hr/                 --> Courier shifts, payroll, SCD2 contract history
+- snapshots/          --> SCD2 snapshot for courier contracts
+- tests/              --> Singular business rule tests
+- seeds/              --> Sample data simulating raw source tables
 
 ---
 
